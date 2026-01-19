@@ -1,21 +1,29 @@
-const puppeteer = require('puppeteer');
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
-(async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+driver = webdriver.Chrome(
+    service=Service(ChromeDriverManager().install())
+)
 
-  await page.goto('https://bonigarcia.dev/selenium-webdriver-java/loading-images.html');
+driver.get(
+    'https://bonigarcia.dev/selenium-webdriver-java/loading-images.html'
+)
 
-  // Ждем, пока все картинки загрузятся (например, что src не равен пустому)
-  await page.waitForFunction(() => {
-    const imgs = document.querySelectorAll('img');
-    return Array.from(imgs).every(img => img.complete && img.naturalWidth !== 0);
-  });
+try:
+    # Ждём, пока в контейнере появится минимум 4 картинки
+    images = WebDriverWait(driver, 20).until(
+        lambda d: len(d.find_elements
+                      (By.CSS_SELECTOR, '#image-container img')) >= 4
+    )
 
-  // Получить src 3-й картинки (индекс 2)
-  const srcValue = await page.$eval('img:nth-of-type(3)', img => img.getAttribute('src'));
+    # Получаем все картинки
+    all_images = driver.find_elements(By.CSS_SELECTOR, '#image-container img')
 
-  console.log(srcValue);
-
-  await browser.close();
-})();
+    # Берём третью картинку и выводим её src
+    third_img_src = all_images[2].get_attribute('src')
+    print(third_img_src)
+finally:
+    driver.quit()

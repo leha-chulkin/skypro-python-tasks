@@ -1,26 +1,28 @@
-const puppeteer = require('puppeteer');
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
-(async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+# Создаём драйвер один раз
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+driver.get('http://uitestingplayground.com/textinput')
 
-  await page.goto('http://uitestingplayground.com/textinput');
+try:
+    # Ждём, пока кнопка станет кликабельной
+    button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, 'updatingButton'))
+    )
+    button.click()
 
-  // Ввести текст "SkyPro" в поле
-  await page.type('#newButtonName', 'SkyPro');
+    # Ждём, пока текст кнопки изменится на "SkyPro"
+    WebDriverWait(driver, 10).until(
+        EC.text_to_be_present_in_element((By.ID, 'updatingButton'), 'SkyPro')
+    )
 
-  // Нажать на синюю кнопку (найдём по тексту или классу)
-  await page.click('.btn-primary');
-
-  // Ждём, пока текст кнопки изменится
-  await page.waitForFunction(
-    () => document.querySelector('.btn-primary').innerText.includes('SkyPro')
-  );
-
-  // Получить текст кнопки
-  const buttonText = await page.$eval('.btn-primary', el => el.innerText);
-
-  console.log(`"${buttonText}"`);
-
-  await browser.close();
-})();
+    # Получаем обновлённый элемент и выводим его текст
+    updated_button = driver.find_element(By.ID, 'updatingButton')
+    print(updated_button.text)
+finally:
+    driver.quit()
