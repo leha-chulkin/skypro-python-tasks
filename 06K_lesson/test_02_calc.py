@@ -6,7 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 
 def test_calculator(driver):
     wait = WebDriverWait(driver, 10)
-    driver.get("https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html")
+    driver.get("https://bonigarcia.dev/selenium-webdriver-" \
+        "java/slow-calculator.html")
     
     delay_input = wait.until(
         EC.element_to_be_clickable((By.ID, 'delay'))
