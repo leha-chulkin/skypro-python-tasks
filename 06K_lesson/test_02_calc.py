@@ -1,12 +1,13 @@
 import pytest
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 @pytest.fixture
 def driver():
     driver = webdriver.Chrome()
+    driver.maximize_window()
     yield driver
     driver.quit()
 
@@ -17,26 +18,29 @@ def test_multiple_elements_click(driver):
     # Вводим задержку
     delay_input = wait.until(EC.element_to_be_clickable((By.ID, 'delay')))
     delay_input.clear()
-    delay_input.send_keys('45')
+    delay_input.send_keys('45')  # Установка задержки, чтобы тест был устойчивым
     
-    # XPath результата (проверьте, актуален ли он)
+    # XPath для результата
     result_xpath = '//*[@id="result"]'
     
-    # Массив XPaths для нажатиия
+    # XPaths для нажатия (подтвердите их актуальность)
     xpaths = [
-        '//*[@id="calculator"]/div[2]/span[1]',
+        '//*[@id="calculator"]/div[2]/span[1]',  # пример, проверьте, что эти XPaths действительны
         '//*[@id="calculator"]/div[2]/span[4]',
         '//*[@id="calculator"]/div[2]/span[2]',
         '//*[@id="calculator"]/div[2]/span[15]',
     ]
     
-    # Проходим по элементам и кликаем
+    # Проходим по кнопкам и кликаем
     for xpath in xpaths:
-        element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
-        element.click()
+        button = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+        button.click()
+        # Можно добавить небольшую задержку, если нужно
+        # time.sleep(0.2)
     
-    # Ждем, пока результат станет равен '15'
+    # Проверяем, что результат обновился
     wait.until(EC.text_to_be_present_in_element((By.XPATH, result_xpath), '15'))
-    # Или, для дополнительной проверкв, можно взять и Assert
+    
+    # Получаем текст результата
     result_text = driver.find_element(By.XPATH, result_xpath).text
     assert '15' in result_text, f"Expected result '15', but got '{result_text}'"

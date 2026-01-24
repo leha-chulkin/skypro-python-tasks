@@ -4,16 +4,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-# Создаём экземпляр драйвера
+# Создаем экземпляр драйвера
 driver = webdriver.Edge()
-wait = WebDriverWait(driver, 10)
+wait = WebDriverWait(driver, 15)  # Увеличьте тайм-аут при необходимости
 
-# Ваш URL с формой
-url = " https://bonigarcia.dev/selenium-webdriver-java/data-types.html"  # Замените на фактический URL
+# Корректный URL без лишних пробелов
+url = "https://bonigarcia.dev/selenium-webdriver-java/data-types.html"  # Проверьте актуальность URL
 
 driver.get(url)
 
-# Правильное соответствие полей
+# Сопоставление имен полей (подтвердите в HTML документах)
 field_mapping = {
     "First name": "first-name",
     "Last name": "last-name",
@@ -27,7 +27,7 @@ field_mapping = {
     "Company": "company",
 }
 
-# Пример данных для заполнения
+# Данные для заполнения
 data_to_fill = {
     "First name": "Иван",
     "Last name": "Иванов",
@@ -41,19 +41,17 @@ data_to_fill = {
     "Company": "SkyPro",
 }
 
-# Заполняем поля
+# Заполнение формы
 for label, name_attr in field_mapping.items():
     try:
-        # Ищем элемент по имени
-        element = wait.until(EC.presence_of_element_located((By.NAME, name_attr)))
-        # Заполняем его значением из данных
-        element.clear()  # очистка поля
+        element = wait.until(EC.element_to_be_clickable((By.NAME, name_attr)))
+        element.clear()
         element.send_keys(data_to_fill[label])
-        print(f"Заполнено поле '{label}'")
+        print(f"Поле '{label}' заполнено.")
     except Exception as e:
-        print(f"Не удалось найти или заполнить поле '{label}': {e}")
+        print(f"Ошибка при заполнении поля '{label}': {e}")
 
-# После заполнения, ищем кнопку "Submit" и кликаем по ней
+# Найти кнопку отправки формы и кликнуть
 try:
     submit_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']")))
     submit_button.click()
@@ -61,8 +59,7 @@ try:
 except Exception as e:
     print(f"Ошибка при отправке формы: {e}")
 
-# Ждём немного, чтобы убедиться, что форма отправилась (опционально)
+# Ожидание для проверки результата (можно заменить на конкретное ожидаемое состояние)
 time.sleep(3)
 
-# Закрываем драйвер
 driver.quit()
