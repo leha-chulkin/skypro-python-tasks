@@ -1,28 +1,42 @@
 import pytest
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+@pytest.fixture
+def driver():
+    driver = webdriver.Chrome()
+    yield driver
+    driver.quit()
 
-def test_calculator(driver):
-    wait = WebDriverWait(driver, 10)
+def test_multiple_elements_click(driver):
+    wait = WebDriverWait(driver, 60)
     driver.get("https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html")
     
-    delay_input = wait.until(
-        EC.element_to_be_clickable((By.ID, 'delay'))
-    )
+    # Вводим задержку
+    delay_input = wait.until(EC.element_to_be_clickable((By.ID, 'delay')))
     delay_input.clear()
     delay_input.send_keys('45')
     
-    # Выполняем операцию 7 + 8 =
-    driver.find_element(By.XPATH, "//button[text()='7']").click()
-    driver.find_element(By.XPATH, "//button[text()='+']").click()
-    driver.find_element(By.XPATH, "//button[text()='8']").click()
-    driver.find_element(By.XPATH, "//button[text()='=']").click()
+    # XPath результата (проверьте, актуален ли он)
+    result_xpath = '//*[@id="result"]'
     
-    # Проверка, что в результате появилось 15
-    wait.until(
-        EC.text_to_be_present_in_element((By.ID, 'result'), '15')
-    )
-    result_text = driver.find_element(By.ID, 'result').text
-    assert result_text == '15'
+    # Массив XPaths для нажатиия
+    xpaths = [
+        '//*[@id="calculator"]/div[2]/span[1]',
+        '//*[@id="calculator"]/div[2]/span[4]',
+        '//*[@id="calculator"]/div[2]/span[2]',
+        '//*[@id="calculator"]/div[2]/span[15]',
+    ]
+    
+    # Проходим по элементам и кликаем
+    for xpath in xpaths:
+        element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+        element.click()
+    
+    # Ждем, пока результат станет равен '15'
+    wait.until(EC.text_to_be_present_in_element((By.XPATH, result_xpath), '15'))
+    # Или, для дополнительной проверкв, можно взять и Assert
+    result_text = driver.find_element(By.XPATH, result_xpath).text
+    assert '15' in result_text, f"Expected result '15', but got '{result_text}'"
