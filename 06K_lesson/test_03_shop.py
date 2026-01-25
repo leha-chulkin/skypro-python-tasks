@@ -17,12 +17,16 @@ try:
     wait.until(EC.element_to_be_clickable((By.ID, "login-button"))).click()
 
     print("Добавление товаров в корзину...")
-    # Используем By.ID
-    wait.until(EC.element_to_be_clickable((By.ID, "add-to-cart-sauce-labs-backpack"))).click()
+    # Добавляем товар Sauce Labs Backpack
+    wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="add-to-cart-sauce-labs-backpack"]'))).click()
     print("Добавлен Sauce Labs Backpack.")
-    wait.until(EC.element_to_be_clickable((By.ID, "add-to-cart-sauce-labs-bolt-t-shirt"))).click()
+
+    # Добавляем товар Sauce Labs Bolt T-Shirt
+    wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="add-to-cart-sauce-labs-bolt-t-shirt"]'))).click()
     print("Добавлен Sauce Labs Bolt T-Shirt.")
-    wait.until(EC.element_to_be_clickable((By.ID, "add-to-cart-sauce-labs-onesie"))).click()
+
+    # Добавляем товар Sauce Labs Onesie
+    wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="add-to-cart-sauce-labs-onesie"]'))).click()
     print("Добавлен Sauce Labs Onesie.")
 
     print("Переход в корзину...")
