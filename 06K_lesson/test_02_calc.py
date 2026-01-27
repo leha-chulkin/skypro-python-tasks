@@ -11,11 +11,11 @@ def driver():
     yield driver
     driver.quit()
 
-def test_multiple_elements_click(driver):
+def test_calculator_with_delay(driver):
     wait = WebDriverWait(driver, 60)
     driver.get("https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html")
     
-    # Вводим задержку
+    # Ввод задержки
     delay_input = wait.until(EC.element_to_be_clickable((By.ID, 'delay')))
     delay_input.clear()
     delay_input.send_keys('45')  # Установка задержки, чтобы тест был устойчивым
@@ -38,9 +38,26 @@ def test_multiple_elements_click(driver):
         # Можно добавить небольшую задержку, если нужно
         # time.sleep(0.2)
     
-    # Проверяем, что результат обновился
-    wait.until(EC.text_to_be_present_in_element((By.XPATH, result_xpath), '15'))
+    # XPath селекторы для кнопок
+    selectors = {
+        '7': "//span[@class='btn btn-outline-primary' and text()='7']",
+        '8': "//span[@class='btn btn-outline-primary' and text()='8']",
+        '+': "//span[@class='operator btn btn-outline-success' and text()='+']",
+        '=': "//span[@class='btn btn-outline-warning' and text()='=']"
+    }
     
-    # Получаем текст результата
-    result_text = driver.find_element(By.XPATH, result_xpath).text
-    assert '15' in result_text, f"Expected result '15', but got '{result_text}'"
+    # Нажимаем "7", "+", "8", "="
+    for label in ['7', '+', '8', '=']:
+        button = wait.until(EC.element_to_be_clickable((By.XPATH, selectors[label])))
+        # Для кнопки "=" используем JavaScript для надежности
+        if label == '=':
+            driver.execute_script("arguments[0].click();", button)
+        else:
+            button.click()
+    
+    # Ждем, пока результат станет "15"
+    wait.until(lambda d: d.find_element(By.CSS_SELECTOR, ".screen").text == "15")
+    
+    # Проверяем результат
+    result = driver.find_element(By.CSS_SELECTOR, ".screen")
+    assert result.text == "15"
