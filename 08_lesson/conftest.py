@@ -16,6 +16,6 @@ def cleanup_project():
                 # Удаляем проект
                 delete_response = requests.delete(f"{API_BASE_URL}/projects/{project_id}")
                 if delete_response.status_code != 204:
-                    print(f"Не удалось удалить проект {project_id}: {delete_response.status_code}")
+                    print(f"Не удалось удалить проект {project_id}:{delete_response.status_code}")
     else:
         print("Не удалось получить список проектов для очистки")
