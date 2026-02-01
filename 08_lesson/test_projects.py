@@ -1,52 +1,68 @@
-# --- ПОЗИТИВНЫЕ ТЕСТЫ ---
+import pytest
+import requests
+from typing import Dict, Any
 
-def test_post_project_positive(session, project_data):
-    response = session.post("/projects", json=project_data)
+@pytest.fixture
+def cleanup_project(session):
+    deleted_ids = []
+
+    def _add_project_id(project_id):
+        deleted_ids.append(project_id)
+
+    yield _add_project_id
+
+    for project_id in deleted_ids:
+        response = session.delete(f"{session.base_url}/projects/{project_id}")
+        if response.status_code != 404:
+            assert response.status_code == 204, f"Failed to delete project {project_id}"
+
+def test_create_and_get_project(session: requests.Session, project_data: Dict[str, Any], cleanup_project) -> None:
+    response = session.post(f"{session.base_url}/projects", json=project_data)
     assert response.status_code == 201
-    data = response.json()
-    assert data["title"] == project_data["title"]
-    assert "id" in data
-    assert data["completed"] is False
+    project_id = response.json()["id"]
+    cleanup_project(project_id)
 
+    response = session.get(f"{session.base_url}/projects/{project_id}")
+    assert response.status_code == 200
+    assert response.json()["title"] == project_data["title"]
 
-def test_put_project_positive(session, project_data, updated_project_data):
-    post_response = session.post("/projects", json=project_data)
-    project_id = post_response.json()["id"]
-    put_response = session.put(f"/projects/{project_id}", json=updated_project_data)
-    assert put_response.status_code == 200
-    data = put_response.json()
-    assert data["title"] == updated_project_data["title"]
-    assert data["completed"] == updated_project_data["completed"]
+def test_update_project(session: requests.Session, project_data: Dict[str, Any], updated_project_data: Dict[str, Any], cleanup_project) -> None:
+    response = session.post(f"{session.base_url}/projects", json=project_data)
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+    cleanup_project(project_id)
 
+    full_update_data = {
+        "title": updated_project_data["title"],
+        "users": project_data["users"]
+    }
 
-def test_get_project_positive(session, project_data):
-    post_response = session.post("/projects", json=project_data)
-    project_id = post_response.json()["id"]
-    get_response = session.get(f"/projects/{project_id}")
-    assert get_response.status_code == 200
-    data = get_response.json()
-    assert data["id"] == project_id
-    assert data["title"] == project_data["title"]
+    response = session.put(f"{session.base_url}/projects/{project_id}", json=full_update_data)
+    assert response.status_code == 200
+    updated = response.json()
+    assert updated["title"] == updated_project_data["title"]
 
+def test_get_projects_list(session: requests.Session) -> None:
+    response = session.get(f"{session.base_url}/projects")
+    assert response.status_code == 200
+    projects = response.json()
+    assert isinstance(projects, list)
 
-# --- НЕГАТИВНЫЕ ТЕСТЫ ---
-
-def test_post_project_negative_missing_title(session):
-    payload = {"completed": False}
-    response = session.post("/projects", json=payload)
+def test_create_project_without_title(session: requests.Session) -> None:
+    invalid_data = {"users": {}}
+    response = session.post(f"{session.base_url}/projects", json=invalid_data)
     assert response.status_code == 400
-    assert "title" in response.json().get("detail", "")
+    response_json = response.json()
+    assert "title" in response_json.get("message", "").lower() or "обязательно" in response_json.get("message", "").lower()
 
-
-def test_put_project_negative_invalid_id(session, updated_project_data):
-    invalid_id = 999999999
-    response = session.put(f"/projects/{invalid_id}", json=updated_project_data)
+def test_update_nonexistent_project(session: requests.Session, updated_project_data: Dict[str, Any]) -> None:
+    invalid_id = "00000000-0000-0000-0000-000000000000"
+    response = session.put(f"{session.base_url}/projects/{invalid_id}", json=updated_project_data)
     assert response.status_code == 404
-    assert "Project not found" in response.text
+    assert response.json().get("message") == "Проект не найден"
 
-
-def test_get_project_negative_invalid_id(session):
-    invalid_id = 999999999
-    response = session.get(f"/projects/{invalid_id}")
+def test_get_nonexistent_project(session: requests.Session) -> None:
+    invalid_id = "11111111-1111-1111-1111-111111111111"
+    response = session.get(f"{session.base_url}/projects/{invalid_id}")
     assert response.status_code == 404
-    assert "Project not found" in response.text
+    assert response.json().get("message") == "Проект не найден"

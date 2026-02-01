@@ -14,7 +14,7 @@
 # ================================================
 
 API_BASE_URL = "https://api.yougile.com/api-v2"
-API_TOKEN = ""  # 🔐 ВСТАВЬТЕ СВОЙ API-ТОКЕН ЗДЕСЬ!
+API_TOKEN = "ebacR8vN8GsMnY2inIE-xNxwIROCfU1xH9kRUcE3eP8yS3pZ5X1vgwnZHrdl7YJ9"  # 🔐 ВСТАВЬТЕ СВОЙ API-ТОКЕН ЗДЕСЬ!
 
 PROJECT_NAME = "Test Project for Automation"
 PROJECT_NAME_UPDATED = "Updated Test Project for Automation"
