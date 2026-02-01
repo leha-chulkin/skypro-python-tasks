@@ -24,3 +24,15 @@ config.py.bak
 *.log
 coverage.xml
 pytest_cache/
+
+@"
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env
+.env/
+__init__.pyc
+__pycache__/
+"@ | Out-File -FilePath .gitignore -Encoding UTF8
