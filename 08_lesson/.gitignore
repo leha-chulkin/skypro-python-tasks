@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+ENV/
+.env
+.env.bak
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+htmlcov/
+.tox/
+.nox/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Config backups
+config.py.bak

@@ -2,21 +2,23 @@
 import pytest
 import requests
 from config import API_BASE_URL, INVALID_PROJECT_ID
-from conftest import headers, session, project_data, updated_project_data
+from conftest import headers, session, project_data, updated_project_data, cleanup_project
+
 
 # =============================
 # [POST] /api-v2/projects
 # =============================
 
-def test_post_project_positive(session, project_data):
+def test_post_project_positive(session, project_data, cleanup_project):
     """Позитивный тест: создание проекта"""
     response = session.post(f"{API_BASE_URL}/projects", json=project_data)
     assert response.status_code == 201, f"Expected 201, got {response.status_code}"
     data = response.json()
     assert "id" in data, "Response should contain 'id'"
     assert data["title"] == project_data["title"], "Title mismatch"
-    # Сохраняем ID для последующего использования
-    pytest.project_id = data["id"]
+
+    # Регистрируем проект для удаления
+    cleanup_project(data["id"])
 
 
 def test_post_project_negative_missing_title(session):
@@ -33,11 +35,15 @@ def test_post_project_negative_missing_title(session):
 # [PUT] /api-v2/projects/{id}
 # =============================
 
-def test_put_project_positive(session, updated_project_data):
+def test_put_project_positive(session, updated_project_data, cleanup_project):
     """Позитивный тест: обновление существующего проекта"""
-    project_id = getattr(pytest, 'project_id', None)
-    assert project_id is not None, "Project must be created first in test_post_project_positive"
+    # Создаём проект
+    response = session.post(f"{API_BASE_URL}/projects", json=updated_project_data)
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+    cleanup_project(project_id)  # Регистрируем для удаления
 
+    # Обновляем
     response = session.put(f"{API_BASE_URL}/projects/{project_id}", json=updated_project_data)
     assert response.status_code == 200, f"Expected 200, got {response.status_code}"
     data = response.json()
@@ -56,11 +62,15 @@ def test_put_project_negative_invalid_id(session, updated_project_data):
 # [GET] /api-v2/projects/{id}
 # =============================
 
-def test_get_project_positive(session):
+def test_get_project_positive(session, cleanup_project):
     """Позитивный тест: получение существующего проекта"""
-    project_id = getattr(pytest, 'project_id', None)
-    assert project_id is not None, "Project must be created first in test_post_project_positive"
+    # Создаём проект
+    response = session.post(f"{API_BASE_URL}/projects", json=project_data)
+    assert response.status_code == 201
+    project_id = response.json()["id"]
+    cleanup_project(project_id)  # Регистрируем для удаления
 
+    # Получаем
     response = session.get(f"{API_BASE_URL}/projects/{project_id}")
     assert response.status_code == 200, f"Expected 200, got {response.status_code}"
     data = response.json()
