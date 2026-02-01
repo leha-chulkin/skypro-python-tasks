@@ -1,5 +1,6 @@
 # test_project_api.py — ПОСЛЕ ИСПРАВЛЕНИЯ
 
+
 # --- ПОЗИТИВНЫЕ ТЕСТЫ ---
 def test_post_project_positive(session, project_data):
     response = session.post("/projects", json=project_data)
