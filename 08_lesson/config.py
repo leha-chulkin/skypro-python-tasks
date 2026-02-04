@@ -1,24 +1,54 @@
-# config.py
-# ================================================
-# 🛑 ВАЖНО: НИКОГДА НЕ КОММИТЬТЕ РЕАЛЬНЫЕ ТОКЕНЫ!
-# ================================================
-# Перед запуском тестов:
-# 1. Откройте этот файл
-# 2. Вставьте свой API-токен Yougile в строку ниже:
-#    AUTH_TOKEN = "your_real_token_here"
+class config:
+    def __init__(self):
+        self.api_key = "api_key"
+        self.user_id = "user_id"
+        self.base_url = "https://ru.yougile.com/api-v2"
+        self.project_id = None
 
-# 3. Сохраните файл
-#
-# 🔐 Токен можно получить в Yougile: Профиль → Настройки → API-ключи
-#
-# ❗️Если токен пустой — тесты не пройдут!
-# ================================================
+    def post_body(self):
+        return {
+            "title": "test",
+            "users": {
+                self.user_id: "admin"
+            }
+        }
 
-API_BASE_URL = "https://api.yougile.com/api-v2"
-API_TOKEN = "ebacR8vN8GsMnY2inIE-xNxwIROCfU1x"
-"H9kRUcE3eP8yS3pZ5X1vgwnZHrdl7YJ9"
-# 🔐 ВСТАВЬТЕ СВОЙ API-ТОКЕН ЗДЕСЬ!
+    def post_body_negative(self):
+        return {
+            "title": "test",
+            "users": {
+                "123": "admin"
+            }
+        }
 
-PROJECT_NAME = "Test Project for Automation"
-PROJECT_NAME_UPDATED = "Updated Test Project for Automation"
-INVALID_PROJECT_ID = "999999999999999999"  # Несуществующий ID
+    def put_body(self):
+        return {
+            "title": "test"
+        }
+
+    def headers(self):
+        return {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+
+    def put_url(self):
+        if self.project_id:
+            return f"{self.base_url}/projects/{self.project_id}"
+        return None
+
+    def put_url_negative(self):
+        if self.project_id:
+            return f"{self.base_url}/projects/"
+        return None
+
+    def get_url(self):
+        if self.project_id:
+            return f"{self.base_url}/projects/{self.project_id}"
+        return None
+
+    def post_url(self):
+        return f"{self.base_url}/projects"
+
+
+config = config()
