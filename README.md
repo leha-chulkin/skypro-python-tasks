@@ -1,1 +1,0 @@
-# skypro-python-tasks
