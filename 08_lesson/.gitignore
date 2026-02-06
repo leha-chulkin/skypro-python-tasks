@@ -1,26 +1,7 @@
-# Виртуальное окружение
+﻿__pycache__/
+*.pyc
+*.pyo
+*.pyd
 venv/
-ENV/
 env/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Конфиги с секретами
-config.py
-config.py.bak
-
-# Тестовые данные / логи
-*.log
-coverage.xml
-pytest_cache/
+__init__.py

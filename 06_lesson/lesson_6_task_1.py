@@ -1,22 +1,28 @@
-const puppeteer = require('puppeteer');
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-(async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+driver = webdriver.Chrome()
+try:
+    driver.get("http://uitestingplayground.com/ajax")
+    wait = WebDriverWait(driver, 10)
 
-  // Перейти на страницу
-  await page.goto('http://uitestingplayground.com/ajax');
+    # Нажать кнопку
+    button = wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, "button#ajaxButton")
+        )
+    )
+    button.click()
 
-  // Нажать на синюю кнопку (на странице её может быть несколько, выберем по тексту)
-  await page.click('button');
-
-  // Ждать появления зеленой плашки (например, с классом 'label-success' или похожий)
-  await page.waitForSelector('.bg-success'); // Например, по целевому классу
-
-  // Получить текст из зеленой плашки
-  const message = await page.$eval('.bg-success', el => el.innerText);
-
-  console.log('Data loaded with AJAX get request.');
-
-  await browser.close();
-})();
+    # Получить текст из зеленой плашки
+    message = wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, "div#content div.alert-success")
+        )
+    )
+    print("Data loaded with AJAX get request.")
+    print(message.text)
+finally:
+    driver.quit()

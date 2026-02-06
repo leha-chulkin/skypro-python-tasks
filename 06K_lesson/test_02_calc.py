@@ -18,7 +18,25 @@ def test_calculator_with_delay(driver):
     # Ввод задержки
     delay_input = wait.until(EC.element_to_be_clickable((By.ID, 'delay')))
     delay_input.clear()
-    delay_input.send_keys('45')
+    delay_input.send_keys('45')  # Установка задержки, чтобы тест был устойчивым
+    
+    # XPath для результата
+    result_xpath = '//*[@id="result"]'
+    
+    # XPaths для нажатия (подтвердите их актуальность)
+    xpaths = [
+        '//*[@id="calculator"]/div[2]/span[1]',  # пример, проверьте, что эти XPaths действительны
+        '//*[@id="calculator"]/div[2]/span[4]',
+        '//*[@id="calculator"]/div[2]/span[2]',
+        '//*[@id="calculator"]/div[2]/span[15]',
+    ]
+    
+    # Проходим по кнопкам и кликаем
+    for xpath in xpaths:
+        button = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+        button.click()
+        # Можно добавить небольшую задержку, если нужно
+        # time.sleep(0.2)
     
     # XPath селекторы для кнопок
     selectors = {
